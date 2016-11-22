@@ -43,7 +43,7 @@ logfile="${logdir}autoban-${stamp}"
 date >> $logfile
 
 # Get list of IPs that failed to log into root
-grep "Failed.password.for" /var/log/auth.log | grep root | awk '{print $11}' | sort -u > /root/possibleOffenders.txt
+grep "Failed.password.for" /var/log/auth.log | grep root | grep -v "message.repeated" | awk '{print $11}' | sort -u > /root/possibleOffenders.txt
 
 # Read list of possible offenses
 while read -r posOff
