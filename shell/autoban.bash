@@ -81,7 +81,7 @@ do
    
     # Ban any IP not already banned
     echo "NO MATCH for $offender. Banning..." >> $logfile
-#    iptables -A INPUT -s $offender -j DROP
+    iptables -A INPUT -s $offender -j DROP
 
 done <"/root/offendingIPs.txt"
 
