@@ -37,7 +37,7 @@ fi
 stamp=$(date | awk '{print $2 "-" $3 "-" $6}')
 
 # Set logfile path
-logfile="${logdir}autoban-${stamp}"
+logfile="${logdir}autoban-${stamp}.log"
 
 # Date entry
 date >> $logfile
@@ -77,12 +77,11 @@ do
     if [[ $banned == *"${offender}"* ]]; then
     	#echo "Match found for $offender in banned IPs" >> $logfile
     	continue
-    fi
-   
-    # Ban any IP not already banned
-    echo "NO MATCH for $offender. Banning..." >> $logfile
-    iptables -A INPUT -s $offender -j DROP
-
+   else
+   	   # Ban any IP not already banned
+       echo "NO MATCH for $offender. Banning..." >> $logfile
+       iptables -A INPUT -s $offender -j DROP
+   fi
 done <"/root/offendingIPs.txt"
 
 # Clean up
