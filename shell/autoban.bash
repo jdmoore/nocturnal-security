@@ -38,6 +38,7 @@ stamp=$(date | awk '{print $2 "-" $3 "-" $6}')
 
 # Set logfile path
 logfile="${logdir}autoban-${stamp}.log"
+bannedfile="${logdir}prerun-banned-${stamp}.log"
 
 # Date entry
 date >> $logfile
@@ -70,18 +71,21 @@ sort -u /root/tmp.txt > /root/offendingIPs.txt
 # Get list of banned IPs
 banned=$(iptables -S | grep "j.DROP" | awk '{print $4}')
 
+# Record currently banned IPs (command is ran again because it is quick, and preserves linebreaks)
+iptables -S | grep "j.DROP" > $bannedfile
+
 # Check offending IPs against the list of banned IPs
 while read -r offender
 do
     # Skip IPs that are already banned
     if [[ $banned == *"${offender}"* ]]; then
     	#echo "Match found for $offender in banned IPs" >> $logfile
-    	continue
-   else
-   	   # Ban any IP not already banned
-       echo "NO MATCH for $offender. Banning..." >> $logfile
-       iptables -A INPUT -s $offender -j DROP
-   fi
+    continue
+    else
+   	    # Ban any IP not already banned
+        echo "NO MATCH for $offender. Banning..." >> $logfile
+        iptables -A INPUT -s $offender -j DROP >> $logfile
+    fi
 done <"/root/offendingIPs.txt"
 
 # Clean up
